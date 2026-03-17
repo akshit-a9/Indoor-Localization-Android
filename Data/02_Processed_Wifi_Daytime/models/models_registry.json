@@ -1,0 +1,26 @@
+{
+  "kNN": {
+    "file": "kNN.joblib",
+    "test_accuracy": 0.8551,
+    "val_accuracy": 0.8406,
+    "needs_scaling": true
+  },
+  "Random Forest": {
+    "file": "Random_Forest.joblib",
+    "test_accuracy": 0.942,
+    "val_accuracy": 0.9565,
+    "needs_scaling": false
+  },
+  "SVM": {
+    "file": "SVM.joblib",
+    "test_accuracy": 0.8841,
+    "val_accuracy": 0.7971,
+    "needs_scaling": true
+  },
+  "Gradient Boosting": {
+    "file": "Gradient_Boosting.joblib",
+    "test_accuracy": 0.8841,
+    "val_accuracy": 0.8696,
+    "needs_scaling": false
+  }
+}
