@@ -1,0 +1,223 @@
+# =============================================================================
+# GIT LFS — CSV files are tracked via LFS, not ignored
+# =============================================================================
+# *.csv  ← managed by .gitattributes / Git LFS
+
+
+# =============================================================================
+# FLUTTER / DART
+# =============================================================================
+# Build outputs
+build/
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+
+# Flutter generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Flutter plugin symlinks & lock artefacts
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-version
+
+# Dart analysis
+.dart_tool/
+dart_tool/
+
+# Generated localizations
+app_localizations.dart
+
+# Flutter coverage
+coverage/
+
+
+# =============================================================================
+# ANDROID (Android Studio / Gradle)
+# =============================================================================
+# Gradle
+*.iml
+.gradle/
+local.properties
+android/.gradle/
+android/local.properties
+android/captures/
+android/app/debug/
+android/app/release/
+android/app/profile/
+
+# Keystores (never commit secrets)
+*.jks
+*.keystore
+
+# AAR / APK / AAB artefacts
+*.apk
+*.aab
+*.aar
+
+# Android Studio project files
+.idea/
+*.iml
+*.iws
+*.ipr
+*.hprof
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries/
+.idea/libraries/
+.idea/caches/
+.idea/navEditor.xml
+.idea/caches/build_file_checksums.ser
+
+# Android Studio navigation editor temp files
+.navigation/
+
+# NDK / CMake
+.externalNativeBuild/
+.cxx/
+cmake-build-*/
+
+# Lint
+lint/intermediates/
+lint/generated/
+lint/outputs/
+lint/tmp/
+
+
+# =============================================================================
+# iOS / Xcode (Flutter multi-platform)
+# =============================================================================
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/Flutter/flutter_assets/
+ios/.flutter-plugins
+ios/Flutter/ephemeral/
+*.xcworkspace
+!default.xcworkspace
+xcuserdata/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivefile
+!default.perspectivefile
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+Pods/
+.symlinks/
+
+# CocoaPods
+!ios/Podfile
+ios/Podfile.lock
+
+
+# =============================================================================
+# macOS
+# =============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+# macOS icon file (has a carriage return in real usage — covered by ._* above)
+Icon
+
+
+# =============================================================================
+# WINDOWS
+# =============================================================================
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+
+# =============================================================================
+# LOGS & TEMP FILES
+# =============================================================================
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+*.bak
+*.orig
+
+
+# =============================================================================
+# SECRETS & ENVIRONMENT
+# =============================================================================
+.env
+.env.*
+*.pem
+*.p12
+google-services.json
+GoogleService-Info.plist
+secrets.properties
+
+
+# =============================================================================
+# EDITORS (VS Code, Vim, Emacs, Sublime)
+# =============================================================================
+.vscode/
+*.code-workspace
+*.vim
+*.nvim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+Session.vim
+.netrwhist
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-workspace
+*.sublime-project
+
+
+# =============================================================================
+# PYTHON (if any analysis scripts live here)
+# =============================================================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+*.egg
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
