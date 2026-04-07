@@ -1,34 +1,34 @@
 {
   "kNN": {
     "file": "kNN.joblib",
-    "test_accuracy": 0.8551,
-    "val_accuracy": 0.8406,
+    "test_accuracy": 0.8647,
+    "val_accuracy": 0.858,
     "needs_scaling": false,
     "onnx_file": "kNN.onnx",
-    "size_kb": 184.9
+    "size_kb": 555.5
   },
   "Random Forest": {
     "file": "Random_Forest.joblib",
-    "test_accuracy": 0.942,
-    "val_accuracy": 0.9565,
+    "test_accuracy": 0.9235,
+    "val_accuracy": 0.9822,
     "needs_scaling": false,
     "onnx_file": "Random_Forest.onnx",
-    "size_kb": 2172.5
+    "size_kb": 29380.6
   },
   "SVM": {
     "file": "SVM.joblib",
-    "test_accuracy": 0.8841,
-    "val_accuracy": 0.7971,
+    "test_accuracy": 0.8824,
+    "val_accuracy": 0.8935,
     "needs_scaling": false,
     "onnx_file": "SVM.onnx",
-    "size_kb": 288.8
+    "size_kb": 1196.0
   },
   "Gradient Boosting": {
     "file": "Gradient_Boosting.joblib",
-    "test_accuracy": 0.8841,
-    "val_accuracy": 0.8696,
+    "test_accuracy": 0.8647,
+    "val_accuracy": 0.929,
     "needs_scaling": false,
     "onnx_file": "Gradient_Boosting.onnx",
-    "size_kb": 2539.2
+    "size_kb": 3309.7
   }
 }
