@@ -1,26 +1,26 @@
 {
   "kNN": {
     "file": "kNN.joblib",
-    "test_accuracy": 0.8647,
-    "val_accuracy": 0.858,
+    "test_accuracy": 0.8777,
+    "val_accuracy": 0.877,
     "needs_scaling": true
   },
   "Random Forest": {
     "file": "Random_Forest.joblib",
-    "test_accuracy": 0.9235,
-    "val_accuracy": 0.9822,
+    "test_accuracy": 0.9415,
+    "val_accuracy": 0.9679,
     "needs_scaling": false
   },
   "SVM": {
     "file": "SVM.joblib",
-    "test_accuracy": 0.8824,
-    "val_accuracy": 0.8935,
+    "test_accuracy": 0.867,
+    "val_accuracy": 0.877,
     "needs_scaling": true
   },
   "Gradient Boosting": {
     "file": "Gradient_Boosting.joblib",
-    "test_accuracy": 0.8647,
-    "val_accuracy": 0.929,
+    "test_accuracy": 0.9096,
+    "val_accuracy": 0.8877,
     "needs_scaling": false
   }
 }
