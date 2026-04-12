@@ -95,6 +95,7 @@ class MainActivity : AppCompatActivity() {
 
                 withContext(Dispatchers.Main) {
                     setupSpinner()
+                    apCountTextView.text = String.format(Locale.US, "APs detected: -- / %d", featureBssids.size)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -185,7 +186,8 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun processScanResults(scanResults: List<ScanResult>) {
         val bssidToRssi = scanResults.associate { it.BSSID.lowercase(Locale.US) to it.level.toFloat() }
-        val featureVector = FloatArray(116) { i ->
+        val featureCount = featureBssids.size
+        val featureVector = FloatArray(featureCount) { i ->
             bssidToRssi[featureBssids[i]] ?: -100.0f
         }
 
@@ -205,7 +207,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         try {
-            val inputTensor = OnnxTensor.createTensor(ortEnv, FloatBuffer.wrap(featureVector), longArrayOf(1, 116))
+            val featureCount = featureBssids.size.toLong()
+            val inputTensor = OnnxTensor.createTensor(ortEnv, FloatBuffer.wrap(featureVector), longArrayOf(1, featureCount))
             val results = session.run(mapOf("rssi_input" to inputTensor))
             
             val predictedClass = try {
@@ -219,7 +222,7 @@ class MainActivity : AppCompatActivity() {
 
             withContext(Dispatchers.Main) {
                 locationTextView.text = String.format(Locale.US, "📍 %s", locationName)
-                apCountTextView.text = String.format(Locale.US, "APs detected: %d / 116", detectedCount)
+                apCountTextView.text = String.format(Locale.US, "APs detected: %d / %d", detectedCount, featureBssids.size)
                 statusTextView.text = "Status: Ready"
                 scanButton.isEnabled = true
             }
