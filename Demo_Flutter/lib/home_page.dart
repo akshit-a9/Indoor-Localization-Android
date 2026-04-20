@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'models/localization_result.dart';
+import 'services/coordinates_service.dart';
 import 'services/inference_engine.dart';
 import 'services/wifi_scanner.dart';
+import 'widgets/location_map.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,6 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _engine = InferenceEngine();
+  final _coords = CoordinatesService();
   RealTimeScanner? _scanner;
   StreamSubscription? _updateSub;
 
@@ -31,7 +34,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _initEngine() async {
     try {
-      await _engine.init();
+      await Future.wait([_engine.init(), _coords.load()]);
       setState(() {
         _engineReady = true;
         _statusMessage = 'Ready';
@@ -92,10 +95,15 @@ class _HomePageState extends State<HomePage> {
 
   bool get _isScanning => _scanner != null && _scanner!.state == ScanState.scanning;
 
+  LocationCoord? get _currentCoord {
+    final label = _latestResult?.locationLabel;
+    if (label == null) return null;
+    return _coords.lookup(label);
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -117,34 +125,14 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 12),
               _LocationCard(result: _latestResult, isScanning: _isScanning),
               const SizedBox(height: 12),
-              if (_isScanning) ...[
-                Card.outlined(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Scan Stats', style: tt.labelLarge),
-                            const Icon(Icons.sync, size: 16, color: Colors.blue),
-                          ],
-                        ),
-                        const Divider(),
-                        _StatRow(label: 'Total Scans:', value: '$_scanCount'),
-                        _StatRow(
-                          label: 'Last Scan:',
-                          value: _lastScanTime != null
-                              ? '${_lastScanTime!.hour}:${_lastScanTime!.minute}:${_lastScanTime!.second}.${_lastScanTime!.millisecond}'
-                              : 'Waiting...',
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
-              _StatusBar(message: _statusMessage),
+              _QuickView(
+                status: _statusMessage,
+                scanCount: _scanCount,
+                lastScanTime: _lastScanTime,
+                isScanning: _isScanning,
+              ),
+              const SizedBox(height: 12),
+              LocationMap(coord: _currentCoord),
               const SizedBox(height: 20),
               _ScanButton(
                 engineReady: _engineReady,
@@ -168,21 +156,64 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class _StatRow extends StatelessWidget {
-  final String label;
-  final String value;
-  const _StatRow({required this.label, required this.value});
+class _QuickView extends StatelessWidget {
+  final String status;
+  final int scanCount;
+  final DateTime? lastScanTime;
+  final bool isScanning;
+
+  const _QuickView({
+    required this.status,
+    required this.scanCount,
+    required this.lastScanTime,
+    required this.isScanning,
+  });
+
+  String _formatTime(DateTime t) =>
+      '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}:${t.second.toString().padLeft(2, '0')}';
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: Theme.of(context).textTheme.bodySmall),
-          Text(value, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold)),
-        ],
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
+    return Card.outlined(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        child: Row(
+          children: [
+            Icon(
+              isScanning ? Icons.sync : Icons.pause_circle_outline,
+              size: 18,
+              color: isScanning ? Colors.blue : cs.onSurfaceVariant,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                status,
+                style: tt.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '$scanCount scan${scanCount == 1 ? '' : 's'}',
+              style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+            ),
+            if (lastScanTime != null) ...[
+              const SizedBox(width: 8),
+              Text('·', style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
+              const SizedBox(width: 8),
+              Text(
+                _formatTime(lastScanTime!),
+                style: tt.bodySmall?.copyWith(
+                  color: cs.onSurfaceVariant,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -272,20 +303,6 @@ class _LocationCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _StatusBar extends StatelessWidget {
-  final String message;
-  const _StatusBar({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      message,
-      style: Theme.of(context).textTheme.bodySmall,
-      textAlign: TextAlign.center,
     );
   }
 }
