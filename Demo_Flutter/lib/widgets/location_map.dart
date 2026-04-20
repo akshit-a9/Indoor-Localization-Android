@@ -28,9 +28,8 @@ class _LocationMapState extends State<LocationMap> {
   void didUpdateWidget(LocationMap oldWidget) {
     super.didUpdateWidget(oldWidget);
     
-    // If we have a new coordinate and we haven't auto-zoomed to it yet
+    // Auto-zoom to a new coordinate if the user isn't manual-panning
     if (widget.coord != null && widget.coord != _lastAutoZoomedCoord) {
-      // If the user isn't actively manual-panning, or if it's the very first detection
       if (!_isUserInteracting || _lastAutoZoomedCoord == null) {
         _zoomToCoord(widget.coord!);
       }
@@ -41,13 +40,9 @@ class _LocationMapState extends State<LocationMap> {
   }
 
   void _zoomToCoord(LocationCoord coord) {
-    // We want to center on the marker.
-    // The coordinate is in map pixels.
-    // Scale 2.5x as requested ("zoom in a bit")
+    // Zoom in (2.5x) and center on the marker
     const double scale = 2.5;
     
-    // We need the widget size to calculate the centering.
-    // Using a microtask to ensure layout is done if this is called early.
     Future.microtask(() {
       if (!mounted) return;
       final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
@@ -60,9 +55,6 @@ class _LocationMapState extends State<LocationMap> {
       final x = coord.x * sx;
       final y = coord.y * sy;
 
-      // Matrix4 for scaling and translating
-      // To center (x, y) at scale S: 
-      // translate(viewWidth/2 - x*S, viewHeight/2 - y*S)
       final matrix = Matrix4.identity()
         ..translate(size.width / 2 - x * scale, size.height / 2 - y * scale)
         ..scale(scale);
@@ -77,7 +69,7 @@ class _LocationMapState extends State<LocationMap> {
   void _resetToFullView() {
     setState(() {
       _controller.value = Matrix4.identity();
-      _isUserInteracting = false;
+      _isUserInteracting = true; // Stay in full view until manually centered or new location arrives
     });
   }
 
@@ -91,7 +83,7 @@ class _LocationMapState extends State<LocationMap> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          padding: const EdgeInsets.only(left: 4, bottom: 4),
           child: Row(
             children: [
               const Icon(Icons.layers_outlined, size: 16),
@@ -104,17 +96,11 @@ class _LocationMapState extends State<LocationMap> {
                     ),
               ),
               const Spacer(),
-              if (_isUserInteracting) 
+              if (widget.coord != null)
                 TextButton.icon(
-                  onPressed: () {
-                    if (widget.coord != null) {
-                      _zoomToCoord(widget.coord!);
-                    } else {
-                      _resetToFullView();
-                    }
-                  },
+                  onPressed: () => _zoomToCoord(widget.coord!),
                   icon: const Icon(Icons.center_focus_strong, size: 16),
-                  label: const Text('Reset', style: TextStyle(fontSize: 12)),
+                  label: const Text('Center', style: TextStyle(fontSize: 12)),
                   style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
                 ),
               TextButton.icon(
@@ -138,7 +124,8 @@ class _LocationMapState extends State<LocationMap> {
             child: InteractiveViewer(
               transformationController: _controller,
               maxScale: 5.0,
-              minScale: 0.5,
+              minScale: 0.1, // Allow zooming out much further
+              boundaryMargin: const EdgeInsets.all(400), // Allow panning outside slightly for better feel
               onInteractionStart: (_) {
                 setState(() => _isUserInteracting = true);
               },
@@ -173,7 +160,7 @@ class _LocationMapState extends State<LocationMap> {
         const Padding(
           padding: EdgeInsets.only(top: 6, left: 4),
           child: Text(
-            'Tip: Pinch to zoom or drag to pan. Map auto-zooms on detection.',
+            'Tip: Pinch to zoom. "Center" snaps back to your location.',
             style: TextStyle(fontSize: 10, color: Colors.grey),
           ),
         ),
