@@ -23,6 +23,7 @@ class InferenceEngine {
   List<String> get featureBssids => List.unmodifiable(_featureBssids);
   List<ModelInfo> get availableModels => List.unmodifiable(_models);
   ModelInfo? get activeModel => _activeModel;
+  Map<int, String> get labelMap => Map.unmodifiable(_labelMap);
 
   Future<void> init() async {
     OrtEnv.instance.init();
