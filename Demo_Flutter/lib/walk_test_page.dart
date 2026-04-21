@@ -68,20 +68,12 @@ class _WalkTestPageState extends State<WalkTestPage> {
       _samples.add(sample);
       _exported = false;
     });
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        content: Text('Logged — actual: ${sample.actual}, predicted: ${sample.predicted}'),
-        duration: const Duration(seconds: 2),
-      ));
   }
 
   Future<void> _exportCsv() async {
     if (_samples.isEmpty) return;
 
-    final buf = StringBuffer()
-      ..writeln('timestamp,actual,predicted,confidence');
+    final buf = StringBuffer()..writeln('timestamp,actual,predicted,confidence');
     for (final s in _samples) {
       final conf = s.confidence?.toStringAsFixed(6) ?? '';
       buf.writeln('${s.timestamp.toIso8601String()},'
@@ -107,7 +99,8 @@ class _WalkTestPageState extends State<WalkTestPage> {
     await file.writeAsString(buf.toString());
 
     // Share the file
-    await Share.shareXFiles([XFile(file.path)], text: 'Indoor Localization Walk Test Export');
+    await Share.shareXFiles([XFile(file.path)],
+        text: 'Indoor Localization Walk Test Export');
 
     if (!mounted) return;
     setState(() => _exported = true);
@@ -150,6 +143,7 @@ class _WalkTestPageState extends State<WalkTestPage> {
     final scanning = widget.scanner?.state == ScanState.scanning;
     final result = _latestResult;
     final canLog = _selectedActual != null && result != null;
+    final tt = Theme.of(context).textTheme;
 
     return PopScope(
       canPop: false,
@@ -192,6 +186,14 @@ class _WalkTestPageState extends State<WalkTestPage> {
                   style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(48)),
                 ),
+                if (_samples.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  Text('Recent Logs (Latest 5)', style: tt.titleSmall),
+                  const SizedBox(height: 8),
+                  ..._samples.reversed
+                      .take(5)
+                      .map((s) => _RecentSampleTile(sample: s)),
+                ],
                 const Spacer(),
                 _SampleCounterBar(
                   count: _samples.length,
@@ -231,7 +233,9 @@ class _PredictionCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               result?.locationLabel ??
-                  (isScanning ? 'Waiting for scan...' : 'Start scanning from home'),
+                  (isScanning
+                      ? 'Waiting for scan...'
+                      : 'Start scanning from home'),
               style: tt.titleMedium?.copyWith(
                 color: isScanning ? cs.onPrimaryContainer : cs.onSurface,
                 fontWeight: FontWeight.bold,
@@ -243,12 +247,84 @@ class _PredictionCard extends StatelessWidget {
               Text(
                 'Confidence: ${(result!.confidence! * 100).toStringAsFixed(1)}%',
                 style: tt.bodySmall?.copyWith(
-                  color: isScanning ? cs.onPrimaryContainer : cs.onSurfaceVariant,
+                  color:
+                      isScanning ? cs.onPrimaryContainer : cs.onSurfaceVariant,
                 ),
               ),
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _RecentSampleTile extends StatelessWidget {
+  final WalkTestSample sample;
+  const _RecentSampleTile({required this.sample});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final isCorrect = sample.actual == sample.predicted;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: cs.outlineVariant.withOpacity(0.5)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isCorrect ? Icons.check_circle_outline : Icons.error_outline,
+            color: isCorrect ? Colors.green : cs.error,
+            size: 18,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    style: tt.bodySmall?.copyWith(color: cs.onSurface),
+                    children: [
+                      const TextSpan(
+                          text: 'Actual: ',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      TextSpan(text: sample.actual),
+                    ],
+                  ),
+                ),
+                RichText(
+                  text: TextSpan(
+                    style: tt.bodySmall?.copyWith(color: cs.onSurface),
+                    children: [
+                      const TextSpan(
+                          text: 'Predicted: ',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      TextSpan(
+                        text: sample.predicted,
+                        style: TextStyle(
+                          color: isCorrect ? null : cs.error,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (sample.confidence != null)
+            Text(
+              '${(sample.confidence! * 100).toStringAsFixed(0)}%',
+              style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
+            ),
+        ],
       ),
     );
   }

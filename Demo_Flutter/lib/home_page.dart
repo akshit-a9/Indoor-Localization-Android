@@ -235,7 +235,7 @@ class _QuickView extends StatelessWidget {
                   onPressed: onWalkTest,
                   icon: const Icon(Icons.directions_walk, size: 16),
                   padding: EdgeInsets.zero,
-                  color: Colors.orange.shade700,
+                  color: Colors.blue,
                   tooltip: 'Walk Test',
                 ),
               ),

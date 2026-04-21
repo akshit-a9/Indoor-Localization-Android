@@ -124,8 +124,11 @@ class _LocationMapState extends State<LocationMap> {
             child: InteractiveViewer(
               transformationController: _controller,
               maxScale: 5.0,
-              minScale: 0.1, // Allow zooming out much further
-              boundaryMargin: const EdgeInsets.all(400), // Allow panning outside slightly for better feel
+              minScale: 1.0, // Prevent zooming out past the map bounds
+              panEnabled: true,
+              scaleEnabled: true,
+              constrained: true, // Keep the content constrained
+              boundaryMargin: const EdgeInsets.all(double.infinity),
               onInteractionStart: (_) {
                 setState(() => _isUserInteracting = true);
               },
